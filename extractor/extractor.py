@@ -6,7 +6,7 @@ import searcher
 
 class Extractor:
     BF_HASHES  = 5
-    BF_BYTES   = 512 * 1024  # 512kb 
+    BF_BYTES   = 8192 * 1024  # 8MB
 
     def __init__(self, max_gram_size, dictionary_file, use_bloomfilter=False):
         self.ngfilter = NGramFilter(max_gram_size)
@@ -19,9 +19,16 @@ class Extractor:
 
     def extract(self, text):
         extracts = []
+
+	t1 = time.time()
+
         for gram in self.ngfilter.filter(text):
             if (self.bloom and not gram in self.bloom):
                 continue
             elif (gram in self.searcher):
                 extracts.append(gram)
+
+        t2 = time.time()
+        print 'extract returned in %0.3f ms' % ((t2-t1)*1000.0)
+       
         return set(extracts)

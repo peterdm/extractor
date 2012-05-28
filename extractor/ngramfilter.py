@@ -6,6 +6,9 @@ class NGramFilter:
 
     def generate(self, query):
         terms = query.split(' ')
+	for t in range(0, len(terms)): # trim any  commas, periods, etc..
+            terms[t] = terms[t].strip(",.;\'<>!?() ")
+
         phrases = []
         for head in range(0,len(terms)):
             newterm = []
