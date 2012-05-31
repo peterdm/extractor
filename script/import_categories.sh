@@ -19,11 +19,12 @@ cut -f 2 | \
 # replace the Wikipedia underscores with spaces
 sed 's/_/ /g' | \
 
-# get rid of terms starting with non-english characters, paranthesis, whitespace, etc...
-egrep '^[a-zA-Z0-9]' | \
-
 # normalize accented characters for search (should do this on the lookup side too!)
-./strip_accent.py > $OUTPUTDIR/enwiki-latest-category.txt
+./strip_accent.py | \
 
-# grams will create seperate files for 1-grams, 2-grams, 3-grams, 4-grams
-./grams.sh
+# convert everything to lower-case
+tr "[:upper:]" "[:lower:]" | \
+
+# get rid of terms starting with non-english characters, paranthesis, whitespace, etc...
+egrep "^[a-z0-9]" 
+

@@ -1,3 +1,4 @@
+import time
 import bloomfilter
 import ngramfilter
 import searcher
@@ -16,11 +17,15 @@ class Extractor:
             self.bloom = BloomFilter(self.BF_BYTES, self.BF_HASHES, iter(f))
         else:
             self.bloom = None
+    
 
-    def extract(self, text):
+    def extract(self, text, case_sensitive=False):
         extracts = []
 
 	t1 = time.time()
+
+        if (not case_sensitive):
+            text = text.lower()
 
         for gram in self.ngfilter.filter(text):
             if (self.bloom and not gram in self.bloom):
