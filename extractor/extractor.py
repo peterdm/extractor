@@ -1,7 +1,7 @@
 import time
-import bloomfilter
-import ngramfilter
-import searcher
+from bloomfilter import BloomFilter
+from ngramfilter import NGramFilter
+from searcher import Searcher
 
 # ask for string, filter for ngrams, for each ngram, collect if bf && searcher, return collection
 
@@ -37,3 +37,14 @@ class Extractor:
         print 'extract returned in %0.3f ms' % ((t2-t1)*1000.0)
        
         return set(extracts)
+
+
+
+def main():
+    e = Extractor(3, '../output/dictionary.txt', True)
+    print e.extract('The Band played on the waterfront')
+    print e.extract('Fanta Orange is the Chess Club soda fountain favorite')
+    print e.extract('the baby sitting Bull jumped over the Crazy Horse')
+
+if __name__ == "__main__":
+    main()
