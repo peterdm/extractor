@@ -1,13 +1,21 @@
-# Split a query into word n-grams
-
+"""
+Split a query into word n-grams
+"""
 class NGramFilter:
     def __init__(self, maxgram):
+        """
+        maxgram -- the longest number of words allowed in an ordered permutation
+        """
         self.maxgram = maxgram
 
+
     def generate(self, query):
+        """
+        query -- the phrase to split into n-grams
+        """
         terms = query.split(' ')
 	for t in range(0, len(terms)): # trim any  commas, periods, etc..
-            terms[t] = terms[t].strip(",.;\'<>!?() ")
+            terms[t] = terms[t].strip(",.\'<>!?() ")
 
         phrases = []
         for head in range(0,len(terms)):
@@ -19,7 +27,11 @@ class NGramFilter:
                     break  
         return phrases
 
+
     def filter(self, query):
+        """
+        Filter is a convenience method.  It returns an iterator over the n-grams for the query provided.
+        """
         return iter(self.generate(query))
 
             
