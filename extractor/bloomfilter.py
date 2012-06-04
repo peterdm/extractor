@@ -15,8 +15,7 @@ class BloomFilter:
             self.load(self.DATAFILE)
         else:
             self.array = bytearray(num_bytes)
-            self.update(iterable)
-            self.save(self.DATAFILE)
+            self.update(iterable, self.DATAFILE)
 
     def get_probes(self, key):
         random = Random(key).random
@@ -30,12 +29,14 @@ class BloomFilter:
         with open(datafile, 'wb') as f:
             f.write(self.array)
 
-    def update(self, keys):
+    def update(self, keys, datafile):
         count = 0
         for key in keys:
             count = count + 1
             for i in self.get_probes(key.strip()):
                 self.array[i//8] |= 2 ** (i%8)
+
+        self.save(datafile)
 
         fp_rate = (1 - math.exp(-self.num_probes*(count+0.5) / (self.num_bins - 1))) ** self.num_probes 
         print 'BF: Indexed %(#)d items.  False positive rate is %(pct).2f pct' % { '#':count, 'pct': round(fp_rate*100,2) }

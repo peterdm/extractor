@@ -14,7 +14,7 @@ gunzip | \
 sed "s/_/ /g" | \
 
 # normalize accented characters for search (should do this on the lookup side too!)
-./strip_accent.py | \
+../extractor/strip_accent.py | \
 
 # convert everything to lower-case
 tr "[:upper:]" "[:lower:]" | \
