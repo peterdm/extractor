@@ -13,6 +13,7 @@ class NGramFilter:
         """
         query -- the phrase to split into n-grams
         """
+        query = query.replace(',', ' ')
         terms = query.split(' ')
 	for t in range(0, len(terms)): # trim any  commas, periods, etc..
             terms[t] = terms[t].strip(",.\'<>!?() ")

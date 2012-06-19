@@ -63,7 +63,7 @@ class Extractor:
     
 
 
-    def extract(self, text, case_sensitive=False):
+    def extract(self, text, case_sensitive=False, timing=False):
         """
         Extracts any phrases found in the dictionary (and not in the stopwords) from the text provided.
 
@@ -74,9 +74,13 @@ class Extractor:
         
         extracts = []
 
-	t1 = time.time()
+        if timing:
+            t1 = time.time()
 
-        text = remove_accents(unicode(text))
+        try:
+            text = remove_accents(unicode(text))
+        except:
+            pass
 
         if (not case_sensitive):
             text = text.lower()
@@ -87,8 +91,9 @@ class Extractor:
             elif (gram in self.searcher and gram not in self.stopwords):
                 extracts.append(gram)
 
-        t2 = time.time()
-        print 'extract returned in %0.3f ms' % ((t2-t1)*1000.0)
+        if timing:
+            t2 = time.time()
+            print 'extract returned in %0.3f ms' % ((t2-t1)*1000.0)
 
         return set(extracts)
 
@@ -128,7 +133,7 @@ class Extractor:
 
 
 def main():
-    e = Extractor(3, '../data/dictionary.txt', '../data/stopwords.txt', True)
+    e = Extractor(3, '../data/dictionary.txt', '../data/stopwords.txt', True, True)
     print e.extract('The Band played on the waterfront')
     print e.extract('Fanta Orange is the Chess Club soda fountain favorite')
     print e.extract('the baby sitting Bull jumped over the Crazy Horse')
