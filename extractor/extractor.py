@@ -4,6 +4,7 @@ The purpose of this class is to identify phrases from a dictionary in text
 
 import time
 import re
+import sys
 from bloomfilter import BloomFilter
 from ngramfilter import NGramFilter
 from searcher import Searcher
@@ -37,7 +38,7 @@ class Extractor:
     BF_BYTES   = 8192 * 1024  # 8MB
 
 
-    def __init__(self, max_gram_size, dictionary_file, stopwords_file, use_bloomfilter=False):
+    def __init__(self, max_gram_size, dictionary_file, stopwords_file, use_bloomfilter=False, timing=False):
         """
         Constructor arguments:
         max_gram_size -- The longest phrase (in words) you want to search for in the dictionary.
@@ -55,6 +56,7 @@ class Extractor:
         self.ngfilter = NGramFilter(max_gram_size)
         self.searcher = Searcher(dictionary_file)
 	self.stopwords = Searcher(stopwords_file)
+        self.timing = timing
         if use_bloomfilter:
             f = open(dictionary_file)
             self.bloom = BloomFilter(self.BF_BYTES, self.BF_HASHES, iter(f))
@@ -63,7 +65,7 @@ class Extractor:
     
 
 
-    def extract(self, text, case_sensitive=False, timing=False):
+    def extract(self, text, case_sensitive=False):
         """
         Extracts any phrases found in the dictionary (and not in the stopwords) from the text provided.
 
@@ -74,13 +76,16 @@ class Extractor:
         
         extracts = []
 
-        if timing:
+        if self.timing:
             t1 = time.time()
 
         try:
             text = remove_accents(unicode(text))
         except:
-            pass
+            try:
+                text = remove_accents(text)
+            except:
+                pass
 
         if (not case_sensitive):
             text = text.lower()
@@ -91,7 +96,7 @@ class Extractor:
             elif (gram in self.searcher and gram not in self.stopwords):
                 extracts.append(gram)
 
-        if timing:
+        if self.timing:
             t2 = time.time()
             print 'extract returned in %0.3f ms' % ((t2-t1)*1000.0)
 
@@ -134,13 +139,17 @@ class Extractor:
 
 def main():
     e = Extractor(3, '../data/dictionary.txt', '../data/stopwords.txt', True, True)
-    print e.extract('The Band played on the waterfront')
-    print e.extract('Fanta Orange is the Chess Club soda fountain favorite')
-    print e.extract('the baby sitting Bull jumped over the Crazy Horse')
-    print e.extract_url('http://www.theatlantic.com/technology/archive/12/06/hey-brother-can-you-spare-a-hubble-dod-sure-have-two/258061/')
-    print e.extract_url('http://money.cnn.com/2012/06/04/technology/groupon-stock-6-billion/index.htm')
-    print e.extract_url('http://www.chateau-st-martin.com')
-    print e.extract_url('http://www.foodandwine.com/articles/rose-underrated-or-overhyped')
+
+    print e.extract_url(sys.argv[1])
+    
+
+#    print e.extract('The Band played on the waterfront')
+#    print e.extract('Fanta Orange is the Chess Club soda fountain favorite')
+#    print e.extract('the baby sitting Bull jumped over the Crazy Horse')
+#    print e.extract_url('http://www.theatlantic.com/technology/archive/12/06/hey-brother-can-you-spare-a-hubble-dod-sure-have-two/258061/')
+#    print e.extract_url('http://money.cnn.com/2012/06/04/technology/groupon-stock-6-billion/index.htm')
+#    print e.extract_url('http://www.chateau-st-martin.com')
+#    print e.extract_url('http://www.foodandwine.com/articles/rose-underrated-or-overhyped')
 
 if __name__ == "__main__":
     main()
