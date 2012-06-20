@@ -12,6 +12,31 @@ from strip_accent import remove_accents
 
 # ask for string, filter for ngrams, for each ngram, collect if bf && searcher, return collection
 
+SINGLE_QUOTE_MAP = {
+        0x2018: 39,
+        0x2019: 39,
+        0x201A: 39,
+        0x201B: 39,
+        0x2039: 39,
+        0x203A: 39,
+}
+
+DOUBLE_QUOTE_MAP = {
+        0x00AB: 34,
+        0x00BB: 34,
+        0x201C: 34,
+        0x201D: 34,
+        0x201E: 34,
+        0x201F: 34,
+}
+
+def convert_smart_quotes(str):
+        return str.translate(DOUBLE_QUOTE_MAP).translate(SINGLE_QUOTE_MAP)
+
+def removeNonAscii(s): return "".join(i for i in s if ord(i)<128)
+
+
+
 class Extractor:
     """
     Extractor Constants:    
@@ -79,6 +104,7 @@ class Extractor:
         if self.timing:
             t1 = time.time()
 
+        # TODO: Refactor
         try:
             text = remove_accents(unicode(text))
         except:
@@ -87,8 +113,29 @@ class Extractor:
             except:
                 pass
 
+        # TODO: Refactor
         if (not case_sensitive):
             text = text.lower()
+
+        # TODO: Refactor
+	    text = text.replace('-',' ') # (e.g. "Japanese-inspired") TODO: Copy out the token variation
+
+        # TODO: Refactor
+        tokens = text.split(' ')
+        terms = []
+        for t in tokens: # trim any  commas, periods, etc..
+            if t is not None:
+                try:
+                    t = unicode(t)              # make sure this is unicode
+                    t = convert_smart_quotes(t) # deal with curly quotes
+                    t = t.strip(",.\'<>!?() ")  # then strip them (and others)
+                    if t is not None:
+                        terms.append(t)
+                except:
+                    pass
+
+        text = " ".join(terms)
+
 
         for gram in self.ngfilter.filter(text):
             if (self.bloom and not gram in self.bloom):
